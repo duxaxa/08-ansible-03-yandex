@@ -1,0 +1,103 @@
+vagrant@test-netology:/playbook$ ansible-playbook -i inventory/yandex.yml -u ansible site.yml
+
+PLAY [Install Clickhouse] **************************************************************************************************************************
+
+TASK [Clickhouse. Get clickhouse distrib] **********************************************************************************************************
+changed: [clickhouse-01] => (item=clickhouse-client)
+changed: [clickhouse-01] => (item=clickhouse-server)
+failed: [clickhouse-01] (item=clickhouse-common-static) => {"ansible_loop_var": "item", "changed": false, "dest": "./clickhouse-common-static_22.3.3.44_all.deb", "elapsed": 1, "item": "clickhouse-common-static", "msg": "Request failed", "response": "HTTP Error 404: Not Found", "status_code": 404, "url": "https://packages.clickhouse.com/deb/pool/stable/clickhouse-common-static_22.3.3.44_all.deb"}
+
+TASK [Clickhouse. Get clickhouse distrib] **********************************************************************************************************
+changed: [clickhouse-01] => (item=clickhouse-client)
+ok: [clickhouse-01] => (item=clickhouse-server)
+ok: [clickhouse-01] => (item=clickhouse-common-static)
+
+TASK [Clickhouse. Install packages] ****************************************************************************************************************
+changed: [clickhouse-01] => (item=./clickhouse-common-static_22.3.3.44_amd64.deb)
+changed: [clickhouse-01] => (item=./clickhouse-client_22.3.3.44_all.deb)
+changed: [clickhouse-01] => (item=./clickhouse-server_22.3.3.44_all.deb)
+
+TASK [Clickhouse. Modify config.xml] ***************************************************************************************************************
+changed: [clickhouse-01]
+
+TASK [Clickhouse. Flush handlers] ******************************************************************************************************************
+
+RUNNING HANDLER [Start clickhouse service] *********************************************************************************************************
+changed: [clickhouse-01]
+
+TASK [Clickhouse. Waiting while clickhouse-server is available...] *********************************************************************************
+Pausing for 30 seconds (output is hidden)
+(ctrl+C then 'C' = continue early, ctrl+C then 'A' = abort)
+ok: [clickhouse-01]
+
+TASK [Clickhouse. Create database] *****************************************************************************************************************
+changed: [clickhouse-01]
+
+TASK [Clickhouse. Create table] ********************************************************************************************************************
+changed: [clickhouse-01]
+
+PLAY [Install Vector] ******************************************************************************************************************************
+
+TASK [Vector. Create work directory] ***************************************************************************************************************
+changed: [vector-01]
+
+TASK [Vector. Get Vector distributive] *************************************************************************************************************
+changed: [vector-01]
+
+TASK [Vector. Unzip archive] ***********************************************************************************************************************
+changed: [vector-01]
+
+TASK [Vector. Install vector binary file] **********************************************************************************************************
+changed: [vector-01]
+
+TASK [Vector. Check Vector installation] ***********************************************************************************************************
+changed: [vector-01]
+
+TASK [Vector. Create etc directory] ****************************************************************************************************************
+changed: [vector-01]
+
+TASK [Vector. Create Vector config vector.yaml] ****************************************************************************************************
+changed: [vector-01]
+
+TASK [Vector. Create vector.service daemon] ********************************************************************************************************
+changed: [vector-01]
+
+TASK [Vector. Modify vector.service file ExecStart] ************************************************************************************************
+changed: [vector-01]
+
+TASK [Vector. Modify vector.service file ExecStartPre] *********************************************************************************************
+changed: [vector-01]
+
+TASK [Vector. Create user vector] ******************************************************************************************************************
+changed: [vector-01]
+
+TASK [Vector. Create data_dir] *********************************************************************************************************************
+changed: [vector-01]
+
+TASK [Vector. Remove work directory] ***************************************************************************************************************
+changed: [vector-01]
+
+RUNNING HANDLER [Start Vector service] *************************************************************************************************************
+changed: [vector-01]
+
+PLAY [Install Lighthouse] **************************************************************************************************************************
+
+TASK [Lighthouse. Pre-install nginx & git client] **************************************************************************************************
+changed: [lighthouse-01]
+
+TASK [Lighthouse. Clone source code by git client] *************************************************************************************************
+changed: [lighthouse-01]
+
+TASK [Lighthouse. Prepare nginx config] ************************************************************************************************************
+changed: [lighthouse-01]
+
+RUNNING HANDLER [Start Lighthouse service] *********************************************************************************************************
+changed: [lighthouse-01]
+
+PLAY RECAP *****************************************************************************************************************************************
+clickhouse-01              : ok=7    changed=6    unreachable=0    failed=0    skipped=0    rescued=1    ignored=0
+lighthouse-01              : ok=4    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+vector-01                  : ok=14   changed=14   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+
+vagrant@test-netology:/playbook$

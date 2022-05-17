@@ -1,0 +1,51 @@
+vagrant@test-netology:/playbook$ ansible-playbook -i inventory/yandex.yml -u ansible deinstall.yml
+
+PLAY [Deinstall Vector] ****************************************************************************************************************************
+
+TASK [Vector. Stop vector.service daemon] **********************************************************************************************************
+changed: [vector-01]
+
+TASK [Vector. Deinstall (remove) vector binary and config files] ***********************************************************************************
+changed: [vector-01] => (item=/usr/bin/vector)
+changed: [vector-01] => (item=/etc/vector/)
+changed: [vector-01] => (item=/lib/systemd/system/vector.service)
+changed: [vector-01] => (item=/var/lib/vector)
+
+TASK [Vector. Remove user vector] ******************************************************************************************************************
+changed: [vector-01]
+
+PLAY [Deinstall Clickhouse] ************************************************************************************************************************
+
+TASK [Clickhouse. Drop database logs] **************************************************************************************************************
+changed: [clickhouse-01]
+
+TASK [Clickhouse. Stop clickhouse-server.service daemon] *******************************************************************************************
+changed: [clickhouse-01]
+
+TASK [Clickhouse. Remove etc and deb packages] *****************************************************************************************************
+changed: [clickhouse-01] => (item=/etc/clickhouse-server)
+changed: [clickhouse-01] => (item=/etc/clickhouse-client)
+changed: [clickhouse-01] => (item=./clickhouse-common-static_22.3.3.44_amd64.deb)
+changed: [clickhouse-01] => (item=./clickhouse-client_22.3.3.44_all.deb)
+changed: [clickhouse-01] => (item=./clickhouse-server_22.3.3.44_all.deb)
+
+TASK [Clickhouse. Deinstall packages] **************************************************************************************************************
+changed: [clickhouse-01]
+
+RUNNING HANDLER [Systemd Daemon Reload] ************************************************************************************************************
+ok: [clickhouse-01]
+
+PLAY [Deinstall Nginx & git client & Lighthouse] ***************************************************************************************************
+
+TASK [Lighthouse. Deinstall nginx & git client] ****************************************************************************************************
+changed: [lighthouse-01]
+
+TASK [Lighthouse. Remove source code and nginx conf] ***********************************************************************************************
+changed: [lighthouse-01] => (item=/lighthouse/)
+changed: [lighthouse-01] => (item=/etc/nginx/conf.d/lighthouse.conf)
+
+PLAY RECAP *****************************************************************************************************************************************
+clickhouse-01              : ok=5    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+lighthouse-01              : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+vector-01                  : ok=3    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+

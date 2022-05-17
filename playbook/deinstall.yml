@@ -1,0 +1,110 @@
+---
+- name: Deinstall Vector
+  hosts: vector
+  gather_facts: false
+
+  handlers:
+    - name: Systemd Daemon Reload
+      become: true
+      ansible.builtin.systemd:
+        daemon_reload: true
+
+  tasks:
+    - block:
+        - name: Vector. Stop vector.service daemon
+          become: true
+          ansible.builtin.service:
+            name: vector.service
+            state: stopped
+
+        - name: Vector. Deinstall (remove) vector binary and config files
+          become: true
+          ansible.builtin.file:
+            path: "{{ item }}"
+            state: absent
+          loop:
+            - "/usr/bin/vector"
+            - "/etc/vector/"
+            - "/lib/systemd/system/vector.service"
+            - "/var/lib/vector"
+
+        - name: Vector. Remove user vector
+          become: true
+          ansible.builtin.user:
+            name: "{{ vector_os_user }}"
+            state: absent
+            remove: true
+      tags: vector
+
+- name: Deinstall Clickhouse
+  hosts: clickhouse
+  gather_facts: false
+
+  handlers:
+    - name: Systemd Daemon Reload
+      become: true
+      ansible.builtin.systemd:
+        daemon_reload: true
+
+  tasks:
+    - block:
+        - name: Clickhouse. Drop database logs
+          ansible.builtin.command: "clickhouse-client --host clickhouse-01 --port 9000 -q 'drop database logs;'"
+          ignore_errors: true
+          register: drop_db
+          changed_when: drop_db.rc == 0 or drop_db.rc == 81
+          # failed_when: never
+
+        - name: Clickhouse. Stop clickhouse-server.service daemon
+          become: true
+          ansible.builtin.service:
+            name: clickhouse-server
+            state: stopped
+
+        - name: Clickhouse. Remove etc and deb packages
+          become: true
+          ansible.builtin.file:
+            path: "{{ item }}"
+            state: absent
+          loop:
+            - "/etc/clickhouse-server"
+            - "/etc/clickhouse-client"
+            - "./clickhouse-common-static_{{ clickhouse_version }}_amd64.deb"
+            - "./clickhouse-client_{{ clickhouse_version }}_all.deb"
+            - "./clickhouse-server_{{ clickhouse_version }}_all.deb"
+
+        - name: Clickhouse. Deinstall packages
+          become: true
+          ansible.builtin.apt:
+            name:
+              - clickhouse-common-static
+              - clickhouse-client
+              - clickhouse-server
+            state: absent
+          notify: Systemd Daemon Reload
+
+      tags: clickhouse
+
+- name: Deinstall Nginx & git client & Lighthouse
+  hosts: lighthouse
+  gather_facts: false
+
+  tasks:
+    - block:
+        - name: Lighthouse. Deinstall nginx & git client
+          become: true
+          ansible.builtin.apt:
+            name: "{{ lighthouse_packages }}"
+            state: absent
+            autoremove: true
+
+        - name: Lighthouse. Remove source code and nginx conf
+          become: true
+          ansible.builtin.file:
+            path: "{{ item }}"
+            state: absent
+          loop:
+            - "{{ lighthouse_data_dir }}"
+            - "/etc/nginx/conf.d/{{ lighthouse_nginx_conf }}"
+
+      tags: lighthouse

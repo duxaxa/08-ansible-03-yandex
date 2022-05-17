@@ -1,0 +1,9 @@
+---
+lighthouse_code_src: "https://github.com/VKCOM/lighthouse.git"
+lighthouse_data_dir: "/lighthouse/"
+lighthouse_packages:
+  - git
+  - nginx
+
+lighthouse_nginx_port: 8888
+lighthouse_nginx_conf: "lighthouse.conf"

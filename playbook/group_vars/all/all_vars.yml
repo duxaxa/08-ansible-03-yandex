@@ -1,0 +1,8 @@
+---
+all_clickhouse_table: "logs_table"
+all_clickhouse_db: "logs"
+# when vagrant local VM:
+# all_clickhouse_url: "http://192.168.10.10:8123"
+
+# when cloud.yandex:
+all_clickhouse_url: "http://192.168.10.11:8123"
